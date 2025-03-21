@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/anna97490/ci-cd-ynov.git/static/css/main.f855e6bc.css",
-    "main.js": "/anna97490/ci-cd-ynov.git/static/js/main.5b88002a.js",
-    "static/js/453.ed3810f9.chunk.js": "/anna97490/ci-cd-ynov.git/static/js/453.ed3810f9.chunk.js",
-    "index.html": "/anna97490/ci-cd-ynov.git/index.html",
-    "main.f855e6bc.css.map": "/anna97490/ci-cd-ynov.git/static/css/main.f855e6bc.css.map",
-    "main.5b88002a.js.map": "/anna97490/ci-cd-ynov.git/static/js/main.5b88002a.js.map",
-    "453.ed3810f9.chunk.js.map": "/anna97490/ci-cd-ynov.git/static/js/453.ed3810f9.chunk.js.map"
+    "main.css": "/ci-cd-ynov/static/css/main.f855e6bc.css",
+    "main.js": "/ci-cd-ynov/static/js/main.98eb3323.js",
+    "static/js/453.ed3810f9.chunk.js": "/ci-cd-ynov/static/js/453.ed3810f9.chunk.js",
+    "index.html": "/ci-cd-ynov/index.html",
+    "main.f855e6bc.css.map": "/ci-cd-ynov/static/css/main.f855e6bc.css.map",
+    "main.98eb3323.js.map": "/ci-cd-ynov/static/js/main.98eb3323.js.map",
+    "453.ed3810f9.chunk.js.map": "/ci-cd-ynov/static/js/453.ed3810f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.5b88002a.js"
+    "static/js/main.98eb3323.js"
   ]
 }
