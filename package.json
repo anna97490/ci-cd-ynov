@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/anna97490/ci-cd-ynov.git",
+  "homepage": "https://anna97490.github.io/ci-cd-ynov/",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -16,7 +16,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test  --coverage  --watchAll --collectCoverageFrom=!src/reportWebVitals.js  --collectCoverageFrom=!src/index.js --collectCoverageFrom=!src/logo.svg",
+    "test": "react-scripts test  --coverage  --watchAll=false --collectCoverageFrom=!src/reportWebVitals.js  --collectCoverageFrom=!src/index.js --collectCoverageFrom=!src/logo.svg",
     "eject": "react-scripts eject",
     "predeploy" : "npm run build",
     "deploy" : "gh-pages -d build"
