@@ -29,6 +29,10 @@ jobs:
            npm ci
            npm run build --if-present
            npm test 
+       - name: Upload coverage reports to Codecov
+         uses: codecov/codecov-action@v5
+         with:
+           token: ${{ secrets.CODECOV_TOKEN }}
        - name: Setup pages
          id: pages
          uses: actions/configure-pages@v3
@@ -38,6 +42,7 @@ jobs:
           # Upload entire repository
           path: build
           if-no-files-found: error
+
    # Deploy job
    deploy:
   # Deploy to the github-pages environment
@@ -58,4 +63,5 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+
      
