@@ -19,7 +19,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
      steps:
    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-       - uses: actions/checkout@v2
+       - uses: actions/checkout@v4
        - name: Use Node.js ${{ matrix.node-version }}
          uses: actions/setup-node@v2
          with:
@@ -33,7 +33,7 @@ jobs:
          id: pages
          uses: actions/configure-pages@v3
        - name: Upload artifact
-         uses: actions/upload-pages-artifact@v2
+         uses: actions/upload-pages-artifact@v3
          with:
           # Upload entire repository
           path: build
@@ -57,5 +57,5 @@ jobs:
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
      
