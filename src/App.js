@@ -1,17 +1,20 @@
 import './App.css';
 import React, { useState } from 'react';
+import Registration from "./components/registration/Registration";
+import UserList from './components/UserList';
 
 function App() {
-  let [count, setCount] = useState(0);
-  const clickOnMe = () => {
-    setCount(count+1);
-  }
-  
+  const [users, setUsers] = useState([]);
+
+  const handleAddUser = (user) => {
+    setUsers((prev) => [...prev, user]);
+  };
+
   return (
     <div className="App">
-      <h1>My app React</h1>
-      <button onClick={clickOnMe}>Click me</button>
-      <span data-testid="count">{count}</span>
+        <h1>Inscription</h1>
+      <Registration onRegister={handleAddUser} />
+      <UserList users={users} />
     </div>
   );
 }

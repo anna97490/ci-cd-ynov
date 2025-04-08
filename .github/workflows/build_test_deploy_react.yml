@@ -17,6 +17,7 @@ jobs:
        matrix:
          node-version: [20.x]
     # Steps represent a sequence of tasks that will be executed as part of the job
+
      steps:
    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
        - uses: actions/checkout@v4
@@ -36,12 +37,29 @@ jobs:
        - name: Setup pages
          id: pages
          uses: actions/configure-pages@v3
+       - name: Check if NPM package version has been updated
+         run: |
+          echo "🔍 Récupération de la version publiée sur npm..."
+          PUBLISHED_VERSION=$(npm view ci-cd-ynov-anna version || echo "0.0.0")
+          echo "Version publiée : $PUBLISHED_VERSION"
+
+          echo "Récupération de la version locale du package..."
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          echo "Version locale : $LOCAL_VERSION"
+
+          if [ "$PUBLISHED_VERSION" = "$LOCAL_VERSION" ]; then
+            echo "La version locale est identique à celle publiée sur npm ($LOCAL_VERSION). Veuillez incrémenter la version dans package.json."
+            exit 1
+          else
+            echo "La version locale est différente de celle sur npm. OK pour publier."
+          fi
        - name: Upload artifact
          uses: actions/upload-pages-artifact@v3
          with:
           # Upload entire repository
           path: build
           if-no-files-found: error
+          #avant artifact ajouter le step qui verifie si la version du npm local est different de celui sur npm
 
    # Deploy job
    deploy:
