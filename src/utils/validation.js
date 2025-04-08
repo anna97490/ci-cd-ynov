@@ -1,5 +1,5 @@
 export const isValidName = (str) => {
-  const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ\-\'\s]+$/;
+  const regex = /^[A-Za-zÀ-ÖØ-öø-ÿ-' \s]+$/;
   return regex.test(str);
 };
 
