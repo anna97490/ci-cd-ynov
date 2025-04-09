@@ -39,7 +39,7 @@ jobs:
          uses: actions/configure-pages@v3
        - name: Check if NPM package version has been updated
          run: |
-          echo "🔍 Récupération de la version publiée sur npm..."
+          echo "Récupération de la version publiée sur npm..."
           PUBLISHED_VERSION=$(npm view ci-cd-ynov-anna version || echo "0.0.0")
           echo "Version publiée : $PUBLISHED_VERSION"
 

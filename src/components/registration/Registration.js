@@ -56,7 +56,7 @@ const Registration = ({ onRegister }) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} data-testid="registration-form">
         {["nom", "prenom", "email", "dateNaissance", "ville", "codePostal"].map((field) => (
           <div key={field}>
             <input

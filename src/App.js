@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useState } from 'react';
 import Registration from "./components/registration/Registration";
-import UserList from './components/UserList';
+import UserList from './components/userlist/UserList';
 
 function App() {
   const [users, setUsers] = useState([]);

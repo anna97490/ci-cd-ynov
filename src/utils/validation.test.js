@@ -6,8 +6,22 @@ import {
   calculateAge,
 } from "../utils/validation";
 
-test("calcul de l'âge", () => {
-  expect(calculateAge("2000-01-01")).toBeGreaterThanOrEqual(24);
+test("calcule l'âge correctement quand la date anniversaire est passée", () => {
+  const today = new Date();
+  const birth = new Date(today.getFullYear() - 20, today.getMonth() - 1, today.getDate());
+  expect(calculateAge(birth.toISOString())).toBe(20);
+});
+
+test("calcule l'âge correctement quand la date anniversaire est aujourd'hui", () => {
+  const today = new Date();
+  const birth = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+  expect(calculateAge(birth.toISOString())).toBe(18);
+});
+
+test("calcule l'âge correctement quand l'anniversaire n'est pas encore passé cette année", () => {
+  const today = new Date();
+  const birth = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate() + 1);
+  expect(calculateAge(birth.toISOString())).toBe(17);
 });
 
 test("âge > 18", () => {
