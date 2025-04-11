@@ -63,8 +63,8 @@ jobs:
          if: ${{ env.NEW_VERSION == 'true' }}
          run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          git config --global user.email "loise.fenoll@gmail.com"
-          git config --global user.name "Loise"
+          git config --global user.email "anna.cousin97490@gmail.com"
+          git config --global user.name "anna97490"
           npm run build-npm
           npm publish
          env:
