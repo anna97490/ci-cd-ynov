@@ -60,11 +60,11 @@ describe("Registration", () => {
 
     fireEvent.submit(screen.getByTestId("registration-form"));
 
-    expect(screen.getByText("Le nom ne doit pas contenir de chiffres ou caractères spéciaux.")).toBeInTheDocument();
-    expect(screen.getByText("Le prénom ne doit pas contenir de chiffres ou caractères spéciaux.")).toBeInTheDocument();
+    expect(screen.getByText("Le nom ne doit contenir que des lettres.")).toBeInTheDocument();
+    expect(screen.getByText("Le prénom ne doit contenir que des lettres.")).toBeInTheDocument();
     expect(screen.getByText("L'adresse email n'est pas valide.")).toBeInTheDocument();
     expect(screen.getByText("Vous devez avoir au moins 18 ans.")).toBeInTheDocument();
-    expect(screen.getByText("Le nom de la ville ne doit pas contenir de chiffres ou caractères spéciaux.")).toBeInTheDocument();
+    expect(screen.getByText("Le nom de la ville ne doit contenir que des lettres.")).toBeInTheDocument();
     expect(screen.getByText("Le code postal doit comporter 5 chiffres.")).toBeInTheDocument();
     expect(toast.error).toHaveBeenCalledWith("Veuillez corriger les erreurs dans le formulaire.");
   });

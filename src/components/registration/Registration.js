@@ -35,10 +35,10 @@ const Registration = ({ onRegister }) => {
     const usersInStorage = JSON.parse(localStorage.getItem('users')) || [];
   
     if (!data.nom) newErrors.nom = "Le nom est requis.";
-    else if (!isValidName(data.nom)) newErrors.nom = "Le nom ne doit pas contenir de chiffres ou caractères spéciaux.";
+    else if (!isValidName(data.nom)) newErrors.nom = "Le nom ne doit contenir que des lettres.";
   
     if (!data.prenom) newErrors.prenom = "Le prénom est requis.";
-    else if (!isValidName(data.prenom)) newErrors.prenom = "Le prénom ne doit pas contenir de chiffres ou caractères spéciaux.";
+    else if (!isValidName(data.prenom)) newErrors.prenom = "Le prénom ne doit contenir que des lettres.";
   
     if (!data.email) newErrors.email = "L'email est requis.";
     else if (!isValidEmail(data.email)) newErrors.email = "L'adresse email n'est pas valide.";
@@ -48,7 +48,7 @@ const Registration = ({ onRegister }) => {
     else if (!isOver18(data.dateNaissance)) newErrors.dateNaissance = "Vous devez avoir au moins 18 ans.";
   
     if (!data.ville) newErrors.ville = "La ville est requise.";
-    else if (!isValidName(data.ville)) newErrors.ville = "Le nom de la ville ne doit pas contenir de chiffres ou caractères spéciaux.";
+    else if (!isValidName(data.ville)) newErrors.ville = "Le nom de la ville ne doit contenir que des lettres.";
   
     if (!data.codePostal) newErrors.codePostal = "Le code postal est requis.";
     else if (!isValidPostalCode(data.codePostal)) newErrors.codePostal = "Le code postal doit comporter 5 chiffres.";
@@ -78,10 +78,10 @@ const Registration = ({ onRegister }) => {
   const isFormValid = Object.keys(validate()).length === 0;
 
   return (
-    <>
+    <div className="registration-wrapper">
       <form onSubmit={handleSubmit} data-testid="registration-form">
         {["nom", "prenom", "email", "dateNaissance", "ville", "codePostal"].map((field) => (
-          <div key={field} style={{ marginBottom: '10px' }}>
+          <div key={field}>
             <input
               name={field}
               type={field === "dateNaissance" ? "date" : "text"}
@@ -95,7 +95,7 @@ const Registration = ({ onRegister }) => {
               }}
             />
             {errors[field] && touched[field] && (
-              <p style={{ color: "red", fontSize: "0.9em" }}>{errors[field]}</p>
+              <p className="error">{errors[field]}</p>
             )}
           </div>
         ))}
@@ -104,7 +104,7 @@ const Registration = ({ onRegister }) => {
         </button>
       </form>
       <ToastContainer />
-    </>
+    </div>
   );
 };
 

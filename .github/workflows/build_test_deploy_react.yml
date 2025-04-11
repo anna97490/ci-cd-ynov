@@ -25,7 +25,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        run: npm install  # Utilise npm install pour installer toutes les dépendances, y compris devDependencies
+        run: npm install  
 
       - name: npm ci, build and test
         run: |
@@ -89,4 +89,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        
+
