@@ -65,7 +65,7 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           git config --global user.email "anna.cousin97490@gmail.com"
           git config --global user.name "anna97490"
-          npm run build-npm
+          NODE_ENV=production rimraf dist && mkdir dist && npx babel src --out-dir dist --copy-files
           npm publish
          env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
