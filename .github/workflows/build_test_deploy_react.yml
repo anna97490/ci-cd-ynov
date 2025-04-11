@@ -2,49 +2,48 @@ name: Build, Test and Deploy React Application
 
 # Controls when the action will run.
 on:
- # Triggers the workflow on push or pull request events but only for the main branch
- push:
-   branches: [ main ]
- pull_request:
-   branches: [ main ]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-   build_test:
-   # The type of runner that the job will run on
-     runs-on: ubuntu-latest
-     strategy:
-       matrix:
-         node-version: [20.x]
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  build_test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - uses: actions/checkout@v4
 
-     steps:
-   # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-       - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
 
-       - name: Use Node.js ${{ matrix.node-version }}
-         uses: actions/setup-node@v2
-         with:
-           node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install  # Utilise npm install pour installer toutes les dépendances, y compris devDependencies
 
-       - name: npm ci, build and test
-         run: |
-           npm ci
-           npm run jsdoc
-           npm run build --if-present
-           npm test 
+      - name: npm ci, build and test
+        run: |
+          npm run jsdoc
+          npm run build --if-present
+          npm test
 
-       - name: Upload coverage reports to Codecov
-         uses: codecov/codecov-action@v5
-         with:
-           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-       - name: Setup pages
-         id: pages
-         uses: actions/configure-pages@v3
+      - name: Setup pages
+        id: pages
+        uses: actions/configure-pages@v3
 
-       - name: Check if NPM package version has been updated
-         run: |
+      - name: Check if NPM package version has been updated
+        run: |
           echo "Récupération de la version publiée sur npm..."
           PUBLISHED_VERSION=$(npm view ci-cd-ynov-anna version || echo "0.0.0")
           echo "Version publiée : $PUBLISHED_VERSION"
@@ -59,43 +58,34 @@ jobs:
             echo "NEW_VERSION=false" >> $GITHUB_ENV
           fi
 
-       - name: Build and publish package on NPM 
-         if: ${{ env.NEW_VERSION == 'true' }}
-         run: |
+      - name: Build and publish package on NPM
+        if: ${{ env.NEW_VERSION == 'true' }}
+        run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           git config --global user.email "anna.cousin97490@gmail.com"
           git config --global user.name "anna97490"
           NODE_ENV=production rimraf dist && mkdir dist && npx babel src --out-dir dist --copy-files
           npm publish
-         env:
+        env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-       - name: Upload artifact
-         uses: actions/upload-pages-artifact@v3
-         with:
-          # Upload entire repository
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
           path: build
           if-no-files-found: error
 
-   # Deploy job
-   deploy:
-  # Deploy to the github-pages environment
+  # Deploy job
+  deploy:
     environment:
-     name: github-pages
-     url: ${{steps.deployment.outputs.page_url}}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
-    # Grant GITHUB_TOKEN the permissions required to make a page deployment
     permissions:
-     pages: write
-     id-token: write
-
-    # Add a dependency to the build job
+      pages: write
+      id-token: write
     needs: build_test
-    # Specify runner + deployment step
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-
-     
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
