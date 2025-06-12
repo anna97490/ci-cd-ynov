@@ -17,11 +17,33 @@ const Registration = ({ onRegister }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [existingUsers, setExistingUsers] = useState([]);
+  const [userCoiunt, setUserCount] = useState([]);
 
-  useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
-    setExistingUsers(storedUsers);
-  }, []);
+  // 1. Charger tous les utilisateurs au montage (GET /users)
+useEffect(() => {
+  const getUser = async () => {
+    try {
+      const response = await fetch(process.env.REACT_APP_API_URL + "/users");
+      const data = await response.json();
+      setUserCount(data.length);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du nombre d'utilisateurs :", error);
+    }
+  };
+
+  getUser();
+
+  fetch(process.env.REACT_APP_API_URL + "/users")
+    .then(response => response.json())
+    .then(data => {
+      // Tu peux mettre ici d'autres effets secondaires si nécessaire
+      console.log("Utilisateurs récupérés (2e appel)", data);
+    })
+    .catch(error => {
+      console.error("Erreur lors de la récupération des utilisateurs :", error);
+    });
+}, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,27 +54,26 @@ const Registration = ({ onRegister }) => {
 
   const validate = (data = formData) => {
     const newErrors = {};
-    const usersInStorage = JSON.parse(localStorage.getItem('users')) || [];
-  
+
     if (!data.nom) newErrors.nom = "Le nom est requis.";
     else if (!isValidName(data.nom)) newErrors.nom = "Le nom ne doit contenir que des lettres.";
-  
+
     if (!data.prenom) newErrors.prenom = "Le prénom est requis.";
     else if (!isValidName(data.prenom)) newErrors.prenom = "Le prénom ne doit contenir que des lettres.";
-  
+
     if (!data.email) newErrors.email = "L'email est requis.";
     else if (!isValidEmail(data.email)) newErrors.email = "L'adresse email n'est pas valide.";
-    else if (usersInStorage.some(user => user.email === data.email)) newErrors.email = "Cet email est déjà utilisé.";
-  
+    else if (existingUsers.some(user => user.email === data.email)) newErrors.email = "Cet email est déjà utilisé.";
+
     if (!data.dateNaissance) newErrors.dateNaissance = "La date de naissance est requise.";
     else if (!isOver18(data.dateNaissance)) newErrors.dateNaissance = "Vous devez avoir au moins 18 ans.";
-  
+
     if (!data.ville) newErrors.ville = "La ville est requise.";
     else if (!isValidName(data.ville)) newErrors.ville = "Le nom de la ville ne doit contenir que des lettres.";
-  
+
     if (!data.codePostal) newErrors.codePostal = "Le code postal est requis.";
     else if (!isValidPostalCode(data.codePostal)) newErrors.codePostal = "Le code postal doit comporter 5 chiffres.";
-  
+
     return newErrors;
   };
 
@@ -61,14 +82,37 @@ const Registration = ({ onRegister }) => {
     const newErrors = validate();
 
     if (Object.keys(newErrors).length === 0) {
-      const updatedUsers = [...existingUsers, formData];
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      setExistingUsers(updatedUsers);
-      onRegister(formData);
-      toast.success("Inscription réussie !");
-      setFormData({ nom: "", prenom: "", email: "", dateNaissance: "", ville: "", codePostal: "" });
-      setErrors({});
-      setTouched({});
+      // 2. Envoyer un nouvel utilisateur en POST /users
+      fetch("http://localhost:8000/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erreur lors de l'inscription");
+          }
+          return response.json();
+        })
+        .then(() => {
+          // Après un ajout réussi, recharger la liste des utilisateurs
+          return fetch("http://localhost:8000/users");
+        })
+        .then(response => response.json())
+        .then(data => {
+          setExistingUsers(data);
+          onRegister(formData);
+          toast.success("Inscription réussie !");
+          setFormData({ nom: "", prenom: "", email: "", dateNaissance: "", ville: "", codePostal: "" });
+          setErrors({});
+          setTouched({});
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error("Erreur lors de l'inscription.");
+        });
     } else {
       setErrors(newErrors);
       toast.error("Veuillez corriger les erreurs dans le formulaire.");

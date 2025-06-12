@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:9.2
+    container_name: ynov-ci-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+    react:
+      build:
+        context: .
+        dockerfile: client/Dockerfile
+      container_name: react
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./client:/app
+        - /app/node_modules
+      environment:
+        - CHOKIDAR_USEPOLLING=true
+      command: npm start
+      depends_on:
+        - server
+
+
+  server:
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: server
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - db
+    command: uvicorn server:app --proxy-headers --host 0.0.0.0 --port 8000
+
+volumes:
+  mysql_data:
