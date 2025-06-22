@@ -10,6 +10,7 @@ export const isValidName = (str) => {
   return regex.test(str);
 };
 
+
 /**
  * Vérifie si un email est valide
  *
@@ -21,6 +22,24 @@ export const isValidEmail = (email) => {
   return regex.test(email);
 };
 
+
+/**
+ * Vérifie si un mot de passe est valide.
+ * Le mot de passe doit contenir au minimum :
+ * - 6 caractères,
+ * - au moins une lettre,
+ * - au moins un chiffre.
+ *
+ * @function
+ * @param {string} password - Le mot de passe à valider.
+ * @returns {boolean} `true` si le mot de passe est valide, sinon `false`.
+ */
+export const isValidPassword = (password) => {
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+  return regex.test(password);
+};
+
+
 /**
  * Vérifie si un code postal est au format français (5 chiffres)
  *
@@ -30,6 +49,7 @@ export const isValidEmail = (email) => {
 export const isValidPostalCode = (code) => {
   return /^\d{5}$/.test(code);
 };
+
 
 /**
  * Calcule l'âge à partir d'une date de naissance
@@ -45,6 +65,7 @@ export const calculateAge = (birthDate) => {
   if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
   return age;
 };
+
 
 /**
  * Vérifie si une personne a au moins 18 ans

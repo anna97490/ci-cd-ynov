@@ -1,14 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Registration.css';
-import { isValidEmail, isValidName, isValidPostalCode, isOver18 } from '../../utils/validation';
+import { useNavigate } from 'react-router-dom';
+import {
+  isValidEmail,
+  isValidName,
+  isValidPostalCode,
+  isOver18,
+  isValidPassword
+} from '../../utils/validation';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { registerUser } from './registrationService';
 
-const Registration = ({ onRegister }) => {
+const Registration = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     nom: "",
     prenom: "",
     email: "",
+    password: "",
     dateNaissance: "",
     ville: "",
     codePostal: "",
@@ -16,42 +27,15 @@ const Registration = ({ onRegister }) => {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [existingUsers, setExistingUsers] = useState([]);
-  const [userCoiunt, setUserCount] = useState([]);
-
-  // 1. Charger tous les utilisateurs au montage (GET /users)
-useEffect(() => {
-  const getUser = async () => {
-    try {
-      const response = await fetch(process.env.REACT_APP_API_URL + "/users");
-      const data = await response.json();
-      setUserCount(data.length);
-    } catch (error) {
-      console.error("Erreur lors de la récupération du nombre d'utilisateurs :", error);
-    }
-  };
-
-  getUser();
-
-  fetch(process.env.REACT_APP_API_URL + "/users")
-    .then(response => response.json())
-    .then(data => {
-      // Tu peux mettre ici d'autres effets secondaires si nécessaire
-      console.log("Utilisateurs récupérés (2e appel)", data);
-    })
-    .catch(error => {
-      console.error("Erreur lors de la récupération des utilisateurs :", error);
-    });
-}, []);
 
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    setErrors(validate({ ...formData, [name]: value }));
-  };
-
+  /**
+   * Valide les données du formulaire.
+   *
+   * @function
+   * @param {Object} [data=formData] - Les données du formulaire à valider.
+   * @returns {Object} Un objet contenant les messages d'erreur pour chaque champ non valide.
+   */
   const validate = (data = formData) => {
     const newErrors = {};
 
@@ -63,7 +47,11 @@ useEffect(() => {
 
     if (!data.email) newErrors.email = "L'email est requis.";
     else if (!isValidEmail(data.email)) newErrors.email = "L'adresse email n'est pas valide.";
-    else if (existingUsers.some(user => user.email === data.email)) newErrors.email = "Cet email est déjà utilisé.";
+
+    if (!data.password) newErrors.password = "Le mot de passe est requis.";
+    else if (!isValidPassword(data.password)) {
+      newErrors.password = "Mot de passe trop faible (6+ caractères, 1 lettre et 1 chiffre).";
+    }
 
     if (!data.dateNaissance) newErrors.dateNaissance = "La date de naissance est requise.";
     else if (!isOver18(data.dateNaissance)) newErrors.dateNaissance = "Vous devez avoir au moins 18 ans.";
@@ -77,74 +65,90 @@ useEffect(() => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+
+  /**
+  * Gère la modification d’un champ du formulaire.
+  *
+  * @function
+  * @param {React.ChangeEvent<HTMLInputElement>} e - Événement de changement de champ.
+  */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setErrors(validate({ ...formData, [name]: value }));
+  };
+
+
+  /**
+   * Gère la soumission du formulaire.
+   *
+   * @async
+   * @function
+   * @param {React.FormEvent<HTMLFormElement>} e - Événement de soumission du formulaire.
+   */
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validate();
 
     if (Object.keys(newErrors).length === 0) {
-      // 2. Envoyer un nouvel utilisateur en POST /users
-      fetch("http://localhost:8000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Erreur lors de l'inscription");
-          }
-          return response.json();
-        })
-        .then(() => {
-          // Après un ajout réussi, recharger la liste des utilisateurs
-          return fetch("http://localhost:8000/users");
-        })
-        .then(response => response.json())
-        .then(data => {
-          setExistingUsers(data);
-          onRegister(formData);
-          toast.success("Inscription réussie !");
-          setFormData({ nom: "", prenom: "", email: "", dateNaissance: "", ville: "", codePostal: "" });
-          setErrors({});
-          setTouched({});
-        })
-        .catch((error) => {
-          console.error(error);
-          toast.error("Erreur lors de l'inscription.");
+      try {
+        await registerUser(formData);
+        toast.success("Inscription réussie ! Redirection vers la page de connexion...");
+        setFormData({
+          nom: "", prenom: "", email: "", password: "",
+          dateNaissance: "", ville: "", codePostal: ""
         });
+        setErrors({});
+        setTouched({});
+        setTimeout(() => navigate("/login"), 2000);
+      } catch (error) {
+        toast.error(error.message || "Erreur lors de l'inscription.");
+      }
     } else {
       setErrors(newErrors);
       toast.error("Veuillez corriger les erreurs dans le formulaire.");
     }
   };
 
+
+  // Vérifie si le formulaire est valide pour activer le bouton de soumission
   const isFormValid = Object.keys(validate()).length === 0;
+
 
   return (
     <div className="registration-wrapper">
       <form onSubmit={handleSubmit} data-testid="registration-form">
-        {["nom", "prenom", "email", "dateNaissance", "ville", "codePostal"].map((field) => (
-          <div key={field}>
+        {[
+          { name: "nom", type: "text" },
+          { name: "prenom", type: "text" },
+          { name: "email", type: "email" },
+          { name: "password", type: "password" },
+          { name: "dateNaissance", type: "date" },
+          { name: "ville", type: "text" },
+          { name: "codePostal", type: "text" },
+        ].map(({ name, type }) => (
+          <div key={name}>
             <input
-              name={field}
-              type={field === "dateNaissance" ? "date" : "text"}
-              placeholder={field}
-              value={formData[field]}
+              name={name}
+              type={type}
+              placeholder={name}
+              value={formData[name]}
               onChange={handleChange}
-              onBlur={() => setTouched((prev) => ({ ...prev, [field]: true }))}
+              onBlur={() => setTouched((prev) => ({ ...prev, [name]: true }))}
               style={{
-                borderColor: errors[field] && touched[field] ? "red" : undefined,
-                borderWidth: errors[field] && touched[field] ? "2px" : "1px",
+                borderColor: errors[name] && touched[name] ? "red" : undefined,
+                borderWidth: errors[name] && touched[name] ? "2px" : "1px",
               }}
             />
-            {errors[field] && touched[field] && (
-              <p className="error">{errors[field]}</p>
+            {errors[name] && touched[name] && (
+              <p className="error">{errors[name]}</p>
             )}
           </div>
         ))}
+
         <button type="submit" disabled={!isFormValid}>
-          Sauvegarder
+          S'inscrire
         </button>
       </form>
       <ToastContainer />

@@ -1,10 +1,16 @@
 USE ynov_ci;
 
-CREATE TABLE utilisateur (
+CREATE TABLE user (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(255) NOT NULL,
   prenom VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  mot_de_passe VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,  
+  dateNaissance DATE NOT NULL,
+  ville VARCHAR(255) NOT NULL,
+  codePostal VARCHAR(5) NOT NULL,
+  role VARCHAR(50),  -- facultatif
   date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+DESCRIBE user;

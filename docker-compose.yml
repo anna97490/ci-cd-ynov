@@ -7,10 +7,13 @@ services:
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./sql-files:/docker-entrypoint-initdb.d 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -26,28 +29,28 @@ services:
     depends_on:
       - db
 
-    react:
-      build:
-        context: .
-        dockerfile: client/Dockerfile
-      container_name: react
-      ports:
-        - "3000:3000"
-      volumes:
-        - ./client:/app
-        - /app/node_modules
-      environment:
-        - CHOKIDAR_USEPOLLING=true
-      command: npm start
-      depends_on:
-        - server
-
+  react:
+    build:
+      context: .
+      dockerfile: src/DockerfileReact
+    container_name: react
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_IGNORE=public/docs
+    command: npm start
+    depends_on:
+      - server
 
   server:
     restart: on-failure
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: server/DockerfilePython
     container_name: server
     env_file:
       - .env
