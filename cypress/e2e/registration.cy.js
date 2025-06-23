@@ -4,12 +4,12 @@ import '@testing-library/cypress'
 
 describe('Page d’inscription', () => {
   it('charge la page d’inscription', () => {
-    cy.visit('/')
+    cy.visit('http://localhost:3000/')
     cy.contains("S'inscrire"); // Titre de ta page React
   })
 
   it('remplit le formulaire et envoie les données', () => {
-    cy.visit('/')
+    cy.visit('http://localhost:3000/') // Assurez-vous que l'URL correspond à votre application
     cy.get('input[name=nom]').type('Doe')
     cy.get('input[name=prenom]').type('Jane')
     cy.get('input[name=email]').type('jane.doe@test.com')
