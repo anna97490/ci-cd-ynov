@@ -78,8 +78,8 @@ jobs:
       # Étapes Docker/Cypress ajoutées ici
       - name: Build the stack
         run: docker compose -f docker-compose.yml up -d
-      #- name: Run e2e tests with Cypress
-       # uses: cypress-io/github-action@v6
+      - name: Run e2e tests with Cypress
+        uses: cypress-io/github-action@v6
       - name: Stop the stack
         run: docker compose -f docker-compose.yml down
 
